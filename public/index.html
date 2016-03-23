@@ -3,33 +3,82 @@
 <head>
   <title>Tic Tac Toe</title>
 </head>
+<link href='https://fonts.googleapis.com/css?family=Crafty+Girls' rel='stylesheet' type='text/css'>
 <style>
 
   body {
+    font-family: 'Crafty Girls', cursive; 
     text-align: center;
-    /*background-image: url("images/artificial-turf.jpg");*/
-   /* background-size: cover;*/
-    background-color: #90C170;
+    background-image: url("images/match.jpg");
+    background-size: 100% auto;
+    background-repeat: no-repeat;
   }
 
-  .title{
+  /*.title{
+    margin-top: 10vh;
     color: white;
-  }
+  }*/
 
   #board-container {
+    margin-top: 20%;
     display: inline-block;
-    width: 60vh;
-    height: 60vh;
+    width: 50vh;
+    height: 50vh;
+    background-image: url("images/cross-board.png");
+    background-size: cover;
+
   }
   .board-slot {
-    background-color: white;
+    /*background-color: white;*/
     display: inline-block;
     vertical-align: top;
     width: 30%;
     height: 30%;
-    border: 1px solid gray;
-    font-size: 18vh;
+    /*border: 1px solid gray;*/
+    font-size: 14vh;
   }
+
+  /*.zero {
+    border-right: 1px solid black;
+    border-bottom: 1px solid black;
+  }
+  .one {
+    border-right: 1px solid black;
+    border-left: 1px solid black;
+    border-bottom: 1px solid black;
+  }
+  .two {
+    border-left: 1px solid black;
+    border-bottom: 1px solid black;
+  }
+  .seven {
+    border-top: 2px solid black;
+    border-right: 1px solid black;
+    border-bottom: 1px solid black;
+  }
+  .eight {
+    border-top: 2px solid black;
+    border-right: 1px solid black;
+    border-left: 1px solid black;
+  }
+  .three {
+    border-top: 2px solid black;
+    border-bottom: 1px solid black;
+    border-left: 1px solid black;
+  }
+  .six {
+    border-top: 2px solid black;
+    border-right: 1px solid black;
+  }
+  .five {
+    border-top: 2px solid black;
+    border-right: 1px solid black;
+    border-left: 1px solid black;
+  }
+  .four {
+    border-top: 2px solid black;
+    border-left: 1px solid black;
+  }*/
 
   .controls {
     display: block;
@@ -42,10 +91,14 @@
     display: inline-block;
     background-color: gray;
     color: white;
-    width: 5em;
-    height: 1.2em;
-    border-radius: 4px;
+    width: 4em;
+    height: 1.4em;
+    border-radius: .5em;
     font-size: 1.6em;
+  }
+
+  .game-button:hover {
+    cursor: pointer;
   }
 
   #reset-button {
@@ -56,6 +109,8 @@
     width: 100%;
     position: absolute;
     text-align: center;
+    margin-top: -20%;
+
   }
 
   #win-message, #tie-message {
@@ -65,22 +120,22 @@
 
 </style>
 <body>
-  <h1 class='title'>TIC TAC TOE</h1>
+  <!-- <h1 class='title'>TIC TAC TOE</h1> -->
   <div id='board-container'>
-    <div class="board-slot" id="0" onclick="userMove(0)"></div
-    ><div class="board-slot" id="1" onclick="userMove(1)"></div
-    ><div class="board-slot" id="2" onclick="userMove(2)"></div
-    ><div class="board-slot" id="7" onclick="userMove(7)"></div
-    ><div class="board-slot" id="8" onclick="userMove(8)"></div
-    ><div class="board-slot" id="3" onclick="userMove(3)"></div
-    ><div class="board-slot" id="6" onclick="userMove(6)"></div
-    ><div class="board-slot" id="5" onclick="userMove(5)"></div
-    ><div class="board-slot" id="4" onclick="userMove(4)">
+    <div class="board-slot zero" id="0" onclick="userMove(0)"></div
+    ><div class="board-slot one" id="1" onclick="userMove(1)"></div
+    ><div class="board-slot two" id="2" onclick="userMove(2)"></div
+    ><div class="board-slot seven" id="7" onclick="userMove(7)"></div
+    ><div class="board-slot eight" id="8" onclick="userMove(8)"></div
+    ><div class="board-slot three" id="3" onclick="userMove(3)"></div
+    ><div class="board-slot six" id="6" onclick="userMove(6)"></div
+    ><div class="board-slot five" id="5" onclick="userMove(5)"></div
+    ><div class="board-slot four" id="4" onclick="userMove(4)">
     </div>
   </div>
   <div class='controls'>
-    <div class='game-button' id='start-button' onclick="startGame()">Start</div>
-    <div class='game-button' id='reset-button' onclick="resetGame()">Reset</div>
+    <div class='game-button' id='start-button' onclick="startGame()">start</div>
+    <div class='game-button' id='reset-button' onclick="resetGame()">reset</div>
   </div>
   <div class='alerts'>
     <h1 id='win-message'>Computer Wins!</h1>
