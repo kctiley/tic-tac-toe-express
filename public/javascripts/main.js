@@ -1,28 +1,13 @@
-var board = [ {position: "topLeft", marker: "[ ]"},
-          {position: "topCenter", marker: "[ ]"},
-          {position: "topRight", marker: "[ ]"},
-          {position: "middleRight", marker: "[ ]"},
-          {position: "bottomRight", marker: "[ ]"},
-          {position: "bottomCenter", marker: "[ ]"},
-          {position: "bottomLeft", marker: "[ ]"},
-          {position: "middleCenter", marker: "[ ]"},
-          {position: "center", marker: "[ ]" }
+var board = [ {position: "topLeft"},
+          {position: "topCenter"},
+          {position: "topRight"},
+          {position: "middleRight"},
+          {position: "bottomRight"},
+          {position: "bottomCenter"},
+          {position: "bottomLeft"},
+          {position: "middleCenter"},
+          {position: "center"}
 ];
-
-var resetGame = function(){
-  board.forEach(function(boardSlot){
-    boardSlot.marker = "[ ]";
-  })
-  winner = false;
-  moveCount = -1;
-  showBoard();
-  gameActive = false;
-  document.getElementById('win-message').style.display = "none";
-  document.getElementById('board-container').style.opacity = 1;
-  document.getElementById('tie-message').style.display = "none";
-  document.getElementById('start-button').style.display = "inline-block";
-  document.getElementById('reset-button').style.display = "none";
-}
 
 var rotateBoard = function(){
   var newFirst = board.slice(6,8);
@@ -43,11 +28,6 @@ var rotateBoardToOriginalPosition = function(){
 }
 
 var showBoard = function(){
-  // console.log("***********");
-  // console.log(board[0].marker, board[1].marker, board[2].marker);
-  // console.log(board[7].marker, board[8].marker, board[3].marker);
-  // console.log(board[6].marker, board[5].marker, board[4].marker);
-  // console.log("***********");
 
   for(var i = 0; i < board.length; i++){
     if(board[i].marker !== "[ ]"){
@@ -55,7 +35,7 @@ var showBoard = function(){
       element.innerHTML = board[i].marker;
     }
     else {
-      // For updating the board in case of game reset
+      // For updating the board in case of game restart
       var element = document.getElementById("" + i + "");
       element.innerHTML = "";
     }
@@ -66,7 +46,6 @@ var updateBoard = function(lastPlayer){
   moveCount++;
   rotateBoardToOriginalPosition();
   showBoard();
-  // console.log("Moves played: " + moveCount);
   availPositions = [];
   board.forEach(function(boardSlot){
     if(boardSlot.marker == "[ ]"){
@@ -285,15 +264,22 @@ var userMove = function(boardSlotId){
 }
 
 // Initial values and game start
-var winner = false;
-var moveCount = -1;
+var winner;
+var moveCount;
 var availPositions;
-var gameActive = false;
+var gameActive;
 
 var startGame = function(){
-  document.getElementById('start-button').style.display = "none";
-  document.getElementById('reset-button').style.display = "inline-block";
+  winner = false;
+  moveCount = -1;
   gameActive = true;
+  board.forEach(function(boardSlot){
+    boardSlot.marker = "[ ]";
+  })
+  var element = document.getElementById('start-button');
+  element.innerHTML = "restart";
+  document.getElementById('win-message').style.display = "none";
+  document.getElementById('tie-message').style.display = "none";
+  document.getElementById('board-container').style.opacity = 1;
   updateBoard()
 }
-
