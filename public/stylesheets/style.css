@@ -7,3 +7,115 @@ body {
 a {
   color: #00B7FF;
 }
+
+body {
+    font-family: 'Crafty Girls', cursive; 
+    text-align: center;
+    background-image: url("/images/match.jpg");
+    background-size: 100% auto;
+    background-repeat: no-repeat;
+  }
+
+  /*.title{
+    margin-top: 10vh;
+    color: white;
+  }*/
+
+  #board-container {
+    margin-top: 20%;
+    display: inline-block;
+    width: 50vh;
+    height: 50vh;
+    background-image: url("/images/cross-board.png");
+    background-size: cover;
+
+  }
+  .board-slot {
+    /*background-color: white;*/
+    display: inline-block;
+    vertical-align: top;
+    width: 30%;
+    height: 30%;
+    /*border: 1px solid gray;*/
+    font-size: 14vh;
+  }
+
+  /*.zero {
+    border-right: 1px solid black;
+    border-bottom: 1px solid black;
+  }
+  .one {
+    border-right: 1px solid black;
+    border-left: 1px solid black;
+    border-bottom: 1px solid black;
+  }
+  .two {
+    border-left: 1px solid black;
+    border-bottom: 1px solid black;
+  }
+  .seven {
+    border-top: 2px solid black;
+    border-right: 1px solid black;
+    border-bottom: 1px solid black;
+  }
+  .eight {
+    border-top: 2px solid black;
+    border-right: 1px solid black;
+    border-left: 1px solid black;
+  }
+  .three {
+    border-top: 2px solid black;
+    border-bottom: 1px solid black;
+    border-left: 1px solid black;
+  }
+  .six {
+    border-top: 2px solid black;
+    border-right: 1px solid black;
+  }
+  .five {
+    border-top: 2px solid black;
+    border-right: 1px solid black;
+    border-left: 1px solid black;
+  }
+  .four {
+    border-top: 2px solid black;
+    border-left: 1px solid black;
+  }*/
+
+  .controls {
+    display: block;
+    width: 100%;
+    margin-top: 0;
+    text-align: center;
+  }
+
+  .game-button {
+    display: inline-block;
+    background-color: gray;
+    color: white;
+    width: 4em;
+    height: 1.4em;
+    border-radius: .5em;
+    font-size: 1.6em;
+  }
+
+  .game-button:hover {
+    cursor: pointer;
+  }
+
+  #reset-button {
+    display: none;
+  }
+
+  .alerts {
+    width: 100%;
+    position: absolute;
+    text-align: center;
+    margin-top: -20%;
+
+  }
+
+  #win-message, #tie-message {
+    display: none;
+    font-size: 46px;
+  }
