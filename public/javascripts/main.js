@@ -57,9 +57,13 @@ var updateGame = function(lastPlayer){
   })
   if(winner){
     gameOverDisplay('win-message');
+    startButton.innerHTML = "play again";
+    startButton.style.opacity = 1;
   }
   else if (availPositions.length == 0){
     gameOverDisplay('tie-message');
+    startButton.innerHTML = "play again";
+    startButton.style.opacity = 1;
   }
   else {
     // (moveCount == 0 || lastPlayer == "User")? computerMove() : console.log("Waiting for user to move..........");
@@ -103,7 +107,20 @@ var computerMove = function() {
         checkForTwoSameAndOneEmpty(0,4,8);
       }
     }
-  }// End checkForBlockOrWin function
+  }
+
+  var chooseRandomAvailablePosition = function(){
+    var availBoardIndexes = [];
+    for (var i = 0; i < board.length; i++) {
+      availPositions.forEach(function(avail){
+        if(avail.position == board[i].position){
+          availBoardIndexes.push(i);
+        }
+      })
+    }
+    console.log(availBoardIndexes)
+    selectRandomIndex(availBoardIndexes);
+  }
 
   var rankOptionsMove = function(){
     console.log("rankOptionsMove...")
@@ -140,9 +157,6 @@ var computerMove = function() {
       // Diagonal scenarios
       checkForNonBlockedMoves(0,4,8);
     }
-    
-
-
   }// End rankOptionsMove function
 
   // Begin Computer check for scenarios
@@ -312,19 +326,8 @@ var computerMove = function() {
       availWinsUser[0].marker = x;
     }
     else {
-      // rankOptionsMove();
-      console.log(availPositions)
-      var availBoardIndexes = [];
-
-      for (var i = 0; i < board.length; i++) {
-        availPositions.forEach(function(avail){
-          if(avail.position == board[i].position){
-            availBoardIndexes.push(i);
-          }
-        })
-      }
-      console.log(availBoardIndexes)
-      selectRandomIndex(availBoardIndexes);
+      chooseRandomAvailablePosition();
+      
     }
   }
   else {
@@ -358,8 +361,10 @@ var winner;
 var moveCount;
 var availPositions;
 var gameActive;
+var startButton = document.getElementById('start-button');
 
 var startGame = function(){
+
   winner = false;
   moveCount = -1;
   gameActive = true;
@@ -368,8 +373,8 @@ var startGame = function(){
     var boardSlot = document.getElementById("" + i + "");
     boardSlot.innerHTML = "";
   }
-  var startButton = document.getElementById('start-button');
   startButton.innerHTML = "restart";
+  startButton.style.opacity = .5;
   document.getElementById('win-message').style.display = "none";
   document.getElementById('tie-message').style.display = "none";
   document.getElementById('board-container').style.opacity = 1;

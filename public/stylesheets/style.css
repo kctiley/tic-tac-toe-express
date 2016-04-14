@@ -93,10 +93,9 @@ body {
     display: inline-block;
     background-color: gray;
     color: white;
-    width: 4em;
-    height: 1.4em;
     border-radius: .5em;
     font-size: 1.6em;
+    padding: 4px;
   }
 
   .game-button:hover {
