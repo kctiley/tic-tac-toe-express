@@ -13,7 +13,7 @@ var x = " X ";
 var o = " O ";
 var blank = "[ ]";
 
-var rotateBoardPerspective = function(){
+var rotateBaordView90Deg = function(){
   var newFirst = board.slice(6,8);
   var newLast = board.slice(0,6);
   var center = board[8];
@@ -25,9 +25,9 @@ var rotateBoardPerspective = function(){
   board = newArr;
 }
 
-var rotateBoardPerspectiveToOriginalPosition = function(){
+var rotateBaordViewToOriginalPosition = function(){
   while(board[0].position !== "topLeft"){
-    rotateBoardPerspective();
+    rotateBaordView90Deg();
   }
 }
 
@@ -47,18 +47,13 @@ var updateGame = function(lastPlayer){
     gameActive = false;
   }
   moveCount++;
-  rotateBoardPerspectiveToOriginalPosition();
   showBoard();
   availPositions = [];
   var isBlank = function(slot){
     return slot.marker == blank;
   }
   availPositions = board.filter(isBlank);
-  // board.forEach(function(boardSlot){
-  //   if(boardSlot.marker == blank){
-  //     availPositions.push(boardSlot);
-  //   }
-  // })
+  
   if(winner){
     gameOverDisplay('win-message');
     startButton.innerHTML = "play again";
@@ -70,45 +65,78 @@ var updateGame = function(lastPlayer){
     startButton.style.opacity = 1;
   }
   else {
-    // (moveCount == 0 || lastPlayer == "User")? computerMove() : console.log("Waiting for user to move..........");
-    (moveCount == 0 || lastPlayer == "Computer")? console.log("Waiting for user to move..........") : computerMove();
+    // (moveCount == 0 || lastPlayer == "User")? computerMove() : console.log("Waiting for user to move...");
+    (moveCount == 0 || lastPlayer == "Computer")? console.log("Waiting for user to move...") : computerMove();
   }
 }
 
 var computerMove = function() { 
   var availWinsUser = [];
   var availWinsComputer = [];
-  var notBlockedlockedMoveOptions = [];
+  var slotsInRowNotBlocked = [];
 
   var selectRandomIndex = function(array){
-    console.log('..selecting random index');
+    console.log("selectRandomIndex..")
     var randomIndex = array[Math.floor(Math.random() * array.length)];
     board[randomIndex].marker = x;
   }
-  var checkForBlockOrWin = function(){
-    var mrkrs = [x, o];
-    for (var i = 0; i < 2; i++){
-      var mrkr = mrkrs[i];
-      var checkForTwoSameAndOneEmpty = function(indexMarked1, indexMarked2, indexBlank ){
-        var indexes = [indexMarked1, indexMarked2, indexBlank];
-        for (var j = 0; j < 3; j++){
-          if(board[indexes[0]].marker == mrkr && board[indexes[1]].marker == mrkr && board[indexes[2]].marker == blank){
-            mrkr == x? availWinsComputer.push(board[indexes[2]]) : availWinsUser.push(board[indexes[2]]); 
-          }
-          indexes.unshift(indexes[2]);
-          var rotatedindexesArray = indexes.slice(0,3);
-          indexes = rotatedindexesArray;
+  
+  var checkForTwoSameAndOneBlankInRow = function(markerOfPlayer){
+    var mrkr = markerOfPlayer
+    var check = function(indexMarked1, indexMarked2, indexBlank){
+      var indexes = [indexMarked1, indexMarked2, indexBlank];
+      var rotateIndexes = function(){
+        indexes.unshift(indexes[2]);
+        var rotatedindexesArray = indexes.slice(0,3);
+        indexes = rotatedindexesArray;
+      }
+      for (var i = 0; i < indexes.length; i++){
+        if(board[indexes[0]].marker == mrkr && board[indexes[1]].marker == mrkr && board[indexes[2]].marker == blank){
+          mrkr == x ? availWinsComputer.push(board[indexes[2]]) : availWinsUser.push(board[indexes[2]]);
         }
+        rotateIndexes();
       }
-      if(availWinsComputer.length == 0){
-        checkForTwoSameAndOneEmpty(0,2,1);
-        checkForTwoSameAndOneEmpty(7,3,8);
-        checkForTwoSameAndOneEmpty(0,4,8);
-      }
+    }
+    if(availWinsComputer.length == 0){
+      check(0,2,1);
+      check(7,3,8);
+      check(0,4,8);
     }
   }
 
-  var chooseRandomAvailablePosition = function(){
+  var checkForBlankSlotInRowNotBlocked = function(){
+    console.log("checkForBlankSlotInRowNotBlocked..")
+    var mrkr = x
+    var check = function(index1, index2, indexBlank){
+      var indexes = [index1, index2, indexBlank];
+      var rotateIndexes = function(){
+        indexes.unshift(indexes[2]);
+        var rotatedindexesArray = indexes.slice(0,3);
+        indexes = rotatedindexesArray;
+      }
+      for (var i = 0; i < indexes.length; i++){
+        if((board[indexes[0]].marker == mrkr || board[indexes[0]].marker == blank) && (board[indexes[1]].marker == mrkr || board[indexes[1]].marker == blank)&& board[indexes[2]].marker == blank){
+          slotsInRowNotBlocked.push(board[indexes[2]]);
+        }
+        rotateIndexes();
+      }
+    }
+    if(availWinsComputer.length == 0){
+      check(0,2,1);
+      check(7,3,8);
+      check(0,4,8);
+    }
+    console.log(slotsInRowNotBlocked);    
+  }
+    
+  var checkForWinMove = function(){
+    checkForTwoSameAndOneBlankInRow(x);
+  }
+  var checkForBlockMove = function(){
+    checkForTwoSameAndOneBlankInRow(o);
+  }
+
+  var chooseAnyAvailablePosition = function(){
     var availBoardIndexes = [];
     for (var i = 0; i < board.length; i++) {
       availPositions.forEach(function(avail){
@@ -117,135 +145,97 @@ var computerMove = function() {
         }
       })
     }
-    console.log(availBoardIndexes)
     selectRandomIndex(availBoardIndexes);
   }
 
   // Begin Computer check for scenarios
-  if (moveCount == 0){
-    var cornerIndexArray = [0, 2, 4, 6]
-    var indexRandom = cornerIndexArray[Math.floor(Math.random() * 4)];
-    var boardSlot = board[indexRandom];
-    boardSlot.marker = x;
-  }
-  else if (moveCount == 1){
-    // Rotate board 3 times to check for match
-    for (var i = 0; i < 4; i++){
-      if(i > 0){rotateBoardPerspective();}
-      if(board[0].marker == o){board[8].marker = x;
-        break;
-      }
-      if(board[1].marker == o){
-        selectRandomIndex([0,2])
-        break;
-      }
-      if(board[8].marker == o){
-        selectRandomIndex([0,2,4,6])
-        break;
-      }
+  for (var i = 0; i < 4; i++){
+    var lastCheck = i == 3;
+    if(lastCheck){console.log("lastCheck!")}
+    checkForWinMove();
+    checkForBlockMove();
+    if(availWinsComputer.length > 0){
+      availWinsComputer[0].marker = x;
+      winner = "Computer wins!";
     }
-  }
-  else if (moveCount == 2){
-    // Rotate board 3 times to check for match and rotate 1 more time to reset to original position
-    for (var i = 0; i < 4; i++){
-      if(i > 0){rotateBoardPerspective();}
-      if(board[0].marker == x){
-        // Scenario 2nd move was center
-        if(board[8].marker == o){board[4].marker = x;
-          break;
-        }
-        // Scenario 2nd move was near side
-        if(board[1].marker == o){board[6].marker = x;
-          break;
-        }
-        if(board[7].marker == o){board[4].marker = x;
-          break;
-        }
-        // Scenario 2nd move was near corner
-        if(board[2].marker == o || board[6].marker == o){board[4].marker = x;
-          break;
-        }
-        // Scenario 2nd move was far side
-        if(board[3].marker == o){board[6].marker = x;
-          break;
-        }
-        if(board[5].marker == o){board[2].marker = x;
-          break;
-        }
-        // Scenario 2nd move was a far corner. This scenario could be included with 2nd move far side scenario IF NOT doing random ux
-        if(board[0].marker == x && board[4].marker == o){
-          //board[2].marker = x;
-          // or go to board[6].marker = x for random ux
-          var cornerIndexArray = [2, 6];
-          var randomIndex = cornerIndexArray[Math.floor(Math.random() * 2)]
-          var boardSlot = board[randomIndex];
-          boardSlot.marker = x;
-          break;
-        }
-      }
+    else if(availWinsUser.length > 0 && lastCheck){
+      availWinsUser[0].marker = x;
     }
-  }
-  else if (moveCount == 3){
-    // Rotate board 3 times to check for match
-    for (var i = 0; i < 4; i++){
-      if(i > 0){rotateBoardPerspective();}
-      checkForBlockOrWin();
-      if(availWinsUser.length > 0){
-        availWinsUser[0].marker = x;
+    else{
+      if (moveCount == 0){
+        selectRandomIndex([0,2,4,6]);
       }
-      else {
-        // o is corner and
+      else if (moveCount == 1){
+        if(board[0].marker == o){board[8].marker = x;
+          break;
+        }
+        if(board[1].marker == o){selectRandomIndex([0,2])
+          break;
+        }
+        if(board[8].marker == o){selectRandomIndex([0,2,4,6])
+          break;
+        }
+      }
+      else if (moveCount == 2){
+        if(board[0].marker == x){
+          if(board[8].marker == o){board[4].marker = x;
+            break;
+          }
+          if(board[1].marker == o){board[6].marker = x;
+            break;
+          }
+          if(board[7].marker == o){board[4].marker = x;
+            break;
+          }
+          if(board[2].marker == o || board[6].marker == o){board[4].marker = x;
+            break;
+          }
+          if(board[3].marker == o){board[6].marker = x;
+            break;
+          }
+          if(board[5].marker == o){board[2].marker = x;
+            break;
+          }
+          if(board[0].marker == x && board[4].marker == o){
+            selectRandomIndex([2,6]);
+            break;
+          }
+        }
+      }
+      else if (moveCount == 3){
         if(board[0].marker == o && board[8].marker == x){
           if(board[3].marker == o || board[5].marker == o){
-            selectRandomIndex([2,4,6])
+            selectRandomIndex([2,4,6]);
+            break;
           }
           if(board[4].marker == o){
-            selectRandomIndex([1,2,3,5,6,7]) 
+            selectRandomIndex([1,3,5,7])
+            break; 
           }
         }
         if((board[0].marker == o && board[2].marker == x) || (board[2].marker == o && board[0].marker == x)){
-          if(board[1].marker == o){board[8].marker = x}
+          if(board[1].marker == o){board[8].marker = x;
+            break;
+          }
         }
         if(board[8].marker == o && board[2].marker == x){
-          if(board[6].marker == o){selectRandomIndex([0,4])}
+          if(board[6].marker == o){
+            selectRandomIndex([0,4]);
+            break;
+          }
         }
       }
-    }
-  }
-  else if (moveCount == 4){
-    // Rotate board 3 times to check for match and rotate 1 more time to reset to original position
-    for (var i = 0; i < 4; i++){
-      if(i > 0){rotateBoardPerspective();}
-      checkForBlockOrWin();
-    }  
-    // Block or Win also covers scenario move 2 was near corner since next move will either be win or block
-    // Go for win
-    if(availWinsComputer.length > 0){
-      availWinsComputer[0].marker = x;
-      console.log("winner computer detected")
-      winner = "Computer wins!";
-    }
-    // Go for block
-    // Block also covers scenario move 2 was center and any 4th move would be block
-    else if(availWinsUser.length > 0){
-      availWinsUser[0].marker = x;
-    }
-    else {
-      for (var i = 0; i < 4; i++){
-        if(i > 0){rotateBoardPerspective();}
+      else if (moveCount == 4){
         if(board[0].marker == x){
-          // Scenario moves 2 and 4 were side moves
           if(board[1].marker == o && board[7].marker == o){board[4].marker = x;
             break;
           }
-          // Scenario move 2 far side and move 4 center
           if(board[3].marker == o && board[8].marker == o){board[6].marker = x;
             break;
           }
           if(board[5].marker == o && board[8].marker == o){board[2].marker = x;
             break;
           }
-          // Scenario 2nd move was far corner
           if(board[1].marker == o && board[4].marker == o && board[2].marker == x){board[6].marker = x;
             break;
           }
@@ -254,47 +244,22 @@ var computerMove = function() {
           }
         }
       }
-    }
-  }
-  else if (moveCount > 4 && moveCount % 2 == 0){
-    // Rotate board 3 times to check for match and rotate 1 more time to reset to original position
-    for (var i = 0; i < 4; i++){
-      if(i > 0){rotateBoardPerspective();}
-      checkForBlockOrWin();
-    }  
-    // Go for win
-    if(availWinsComputer.length > 0){
-      availWinsComputer[0].marker = x;
-      winner = "Computer wins";
-    }
-    // Go for block if win not avail
-    else if(availWinsUser.length > 0){  
-      availWinsUser[0].marker = x;
-    }
-    else {
-      // console.log("In moveCount > 4 ...scenario not coded")
-    }
-  }
-  else if(moveCount == 5 || moveCount == 7 || moveCount == 9){
-    for (var i = 0; i < 4; i++){
-      if(i > 0){rotateBoardPerspective();}
-      checkForBlockOrWin();
-    }
-    if(availWinsComputer.length > 0){
-        availWinsComputer[0].marker = x;
-        winner = "Computer wins";
+      else if(moveCount > 4 && lastCheck){
+        checkForBlankSlotInRowNotBlocked()
+        if (slotsInRowNotBlocked.length > 0){
+          selectRandomIndex(slotsInRowNotBlocked)
+        }
+        else{
+          selectRandomIndex(availPositions);
+        }
       }
-    else if(availWinsUser.length > 0){
-      availWinsUser[0].marker = x;
+      else{
+        console.log("No matchingscenarios iteration" + i)
+      }
     }
-    else {
-      chooseRandomAvailablePosition();
-      
-    }
+    rotateBaordView90Deg();
   }
-  else {
-    console.log("Scenario not coded yet")
-  }
+  rotateBaordViewToOriginalPosition();
   updateGame("Computer");
 
 }
@@ -310,11 +275,11 @@ var userMove = function(boardSlotId){
         updateGame("User");
       }
     }
-    // if(moveValid == false){
-    //   var continueGame = prompt("Invalid move. Continue y or n?");
-    //   if(continueGame == "y"){
-    //   }
-    // }
+    if(moveValid == false){
+      var continueGame = prompt("Invalid move. Continue y or n?");
+      if(continueGame == "y"){
+      }
+    }
   }
 }
 
