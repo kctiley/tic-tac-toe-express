@@ -16,11 +16,6 @@ body {
     background-repeat: no-repeat;
   }
 
-  /*.title{
-    margin-top: 10vh;
-    color: white;
-  }*/
-
   #board-container {
     margin-top: 20%;
     display: inline-block;
@@ -31,56 +26,12 @@ body {
 
   }
   .board-slot {
-    /*background-color: white;*/
     display: inline-block;
     vertical-align: top;
     width: 30%;
     height: 30%;
-    /*border: 1px solid gray;*/
     font-size: 14vh;
   }
-
-  /*.zero {
-    border-right: 1px solid black;
-    border-bottom: 1px solid black;
-  }
-  .one {
-    border-right: 1px solid black;
-    border-left: 1px solid black;
-    border-bottom: 1px solid black;
-  }
-  .two {
-    border-left: 1px solid black;
-    border-bottom: 1px solid black;
-  }
-  .seven {
-    border-top: 2px solid black;
-    border-right: 1px solid black;
-    border-bottom: 1px solid black;
-  }
-  .eight {
-    border-top: 2px solid black;
-    border-right: 1px solid black;
-    border-left: 1px solid black;
-  }
-  .three {
-    border-top: 2px solid black;
-    border-bottom: 1px solid black;
-    border-left: 1px solid black;
-  }
-  .six {
-    border-top: 2px solid black;
-    border-right: 1px solid black;
-  }
-  .five {
-    border-top: 2px solid black;
-    border-right: 1px solid black;
-    border-left: 1px solid black;
-  }
-  .four {
-    border-top: 2px solid black;
-    border-left: 1px solid black;
-  }*/
 
   .controls {
     display: block;
@@ -89,7 +40,7 @@ body {
     text-align: center;
   }
 
-  .game-button {
+  #start-button {
     display: inline-block;
     background-color: gray;
     color: white;
@@ -98,12 +49,8 @@ body {
     padding: 4px;
   }
 
-  .game-button:hover {
+  #start-button:hover {
     cursor: pointer;
-  }
-
-  #reset-button {
-    display: none;
   }
 
   .alerts {

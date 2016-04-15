@@ -13,7 +13,7 @@ var x = " X ";
 var o = " O ";
 var blank = "[ ]";
 
-var rotateBoard = function(){
+var rotateBoardPerspective = function(){
   var newFirst = board.slice(6,8);
   var newLast = board.slice(0,6);
   var center = board[8];
@@ -25,9 +25,9 @@ var rotateBoard = function(){
   board = newArr;
 }
 
-var rotateBoardToOriginalPosition = function(){
+var rotateBoardPerspectiveToOriginalPosition = function(){
   while(board[0].position !== "topLeft"){
-    rotateBoard();
+    rotateBoardPerspective();
   }
 }
 
@@ -41,20 +41,24 @@ var showBoard = function(){
 }
 
 var updateGame = function(lastPlayer){
-  moveCount++;
-  rotateBoardToOriginalPosition();
-  showBoard();
-  availPositions = [];
   var gameOverDisplay = function(messageId){
     document.getElementById(messageId).style.display = "block";
     document.getElementById('board-container').style.opacity = .15;
     gameActive = false;
   }
-  board.forEach(function(boardSlot){
-    if(boardSlot.marker == blank){
-      availPositions.push(boardSlot);
-    }
-  })
+  moveCount++;
+  rotateBoardPerspectiveToOriginalPosition();
+  showBoard();
+  availPositions = [];
+  var isBlank = function(slot){
+    return slot.marker == blank;
+  }
+  availPositions = board.filter(isBlank);
+  // board.forEach(function(boardSlot){
+  //   if(boardSlot.marker == blank){
+  //     availPositions.push(boardSlot);
+  //   }
+  // })
   if(winner){
     gameOverDisplay('win-message');
     startButton.innerHTML = "play again";
@@ -97,13 +101,8 @@ var computerMove = function() {
         }
       }
       if(availWinsComputer.length == 0){
-        // Perimeter win scenarios
         checkForTwoSameAndOneEmpty(0,2,1);
-
-        // Center row win scenarios
         checkForTwoSameAndOneEmpty(7,3,8);
-
-        // Diagonal scenarios
         checkForTwoSameAndOneEmpty(0,4,8);
       }
     }
@@ -122,43 +121,6 @@ var computerMove = function() {
     selectRandomIndex(availBoardIndexes);
   }
 
-  var rankOptionsMove = function(){
-    console.log("rankOptionsMove...")
-    var mrkr = x;
-    var checkForNonBlockedMoves = function(index1, index2, index3){
-      var indexes = [index1, index2, index3];
-      for (var j = 0; j < 3; j++){
-        if(board[indexes[0]].marker == blank && board[indexes[1]].marker == blank && board[indexes[2]].marker == blank){
-          notBlockedlockedMoveOptions.push(board[indexes[0]]); 
-          notBlockedlockedMoveOptions.push(board[indexes[1]]); 
-          console.log("pushing positions with one x in linear",board[indexes[0]],board[indexes[1]]) 
-        }
-        if(board[indexes[0]].marker == blank && board[indexes[1]].marker == blank && board[indexes[2]].marker == blank){
-          notBlockedlockedMoveOptions.push(board[indexes[0]]);
-          notBlockedlockedMoveOptions.push(board[indexes[1]]);
-          notBlockedlockedMoveOptions.push(board[indexes[2]]);
-        }
-        if(board[indexes[0]].marker == blank){notBlockedlockedMoveOptions.push(board[indexes[0]]);} 
-        if(board[indexes[1]].marker == blank){notBlockedlockedMoveOptions.push(board[indexes[1]]);} 
-        if(board[indexes[2]].marker == blank){notBlockedlockedMoveOptions.push(board[indexes[2]]);} 
-
-        indexes.unshift(indexes[2]);
-        var rotatedindexesArray = indexes.slice(0,3);
-        indexes = rotatedindexesArray;
-      }
-    }
-    if(availWinsComputer.length == 0){
-      // Perimeter scenarios
-      checkForNonBlockedMoves(0,1,2);
-
-      // Center row scenarios
-      checkForNonBlockedMoves(7,8,3);
-
-      // Diagonal scenarios
-      checkForNonBlockedMoves(0,4,8);
-    }
-  }// End rankOptionsMove function
-
   // Begin Computer check for scenarios
   if (moveCount == 0){
     var cornerIndexArray = [0, 2, 4, 6]
@@ -169,7 +131,7 @@ var computerMove = function() {
   else if (moveCount == 1){
     // Rotate board 3 times to check for match
     for (var i = 0; i < 4; i++){
-      if(i > 0){rotateBoard();}
+      if(i > 0){rotateBoardPerspective();}
       if(board[0].marker == o){board[8].marker = x;
         break;
       }
@@ -186,7 +148,7 @@ var computerMove = function() {
   else if (moveCount == 2){
     // Rotate board 3 times to check for match and rotate 1 more time to reset to original position
     for (var i = 0; i < 4; i++){
-      if(i > 0){rotateBoard();}
+      if(i > 0){rotateBoardPerspective();}
       if(board[0].marker == x){
         // Scenario 2nd move was center
         if(board[8].marker == o){board[4].marker = x;
@@ -226,7 +188,7 @@ var computerMove = function() {
   else if (moveCount == 3){
     // Rotate board 3 times to check for match
     for (var i = 0; i < 4; i++){
-      if(i > 0){rotateBoard();}
+      if(i > 0){rotateBoardPerspective();}
       checkForBlockOrWin();
       if(availWinsUser.length > 0){
         availWinsUser[0].marker = x;
@@ -253,7 +215,7 @@ var computerMove = function() {
   else if (moveCount == 4){
     // Rotate board 3 times to check for match and rotate 1 more time to reset to original position
     for (var i = 0; i < 4; i++){
-      if(i > 0){rotateBoard();}
+      if(i > 0){rotateBoardPerspective();}
       checkForBlockOrWin();
     }  
     // Block or Win also covers scenario move 2 was near corner since next move will either be win or block
@@ -270,7 +232,7 @@ var computerMove = function() {
     }
     else {
       for (var i = 0; i < 4; i++){
-        if(i > 0){rotateBoard();}
+        if(i > 0){rotateBoardPerspective();}
         if(board[0].marker == x){
           // Scenario moves 2 and 4 were side moves
           if(board[1].marker == o && board[7].marker == o){board[4].marker = x;
@@ -297,7 +259,7 @@ var computerMove = function() {
   else if (moveCount > 4 && moveCount % 2 == 0){
     // Rotate board 3 times to check for match and rotate 1 more time to reset to original position
     for (var i = 0; i < 4; i++){
-      if(i > 0){rotateBoard();}
+      if(i > 0){rotateBoardPerspective();}
       checkForBlockOrWin();
     }  
     // Go for win
@@ -315,7 +277,7 @@ var computerMove = function() {
   }
   else if(moveCount == 5 || moveCount == 7 || moveCount == 9){
     for (var i = 0; i < 4; i++){
-      if(i > 0){rotateBoard();}
+      if(i > 0){rotateBoardPerspective();}
       checkForBlockOrWin();
     }
     if(availWinsComputer.length > 0){
@@ -348,11 +310,11 @@ var userMove = function(boardSlotId){
         updateGame("User");
       }
     }
-    if(moveValid == false){
-      var continueGame = prompt("Invalid move. Continue y or n?");
-      if(continueGame == "y"){
-      }
-    }
+    // if(moveValid == false){
+    //   var continueGame = prompt("Invalid move. Continue y or n?");
+    //   if(continueGame == "y"){
+    //   }
+    // }
   }
 }
 
@@ -364,7 +326,6 @@ var gameActive;
 var startButton = document.getElementById('start-button');
 
 var startGame = function(){
-
   winner = false;
   moveCount = -1;
   gameActive = true;
@@ -374,7 +335,7 @@ var startGame = function(){
     boardSlot.innerHTML = "";
   }
   startButton.innerHTML = "restart";
-  startButton.style.opacity = .5;
+  startButton.style.opacity = 0;
   document.getElementById('win-message').style.display = "none";
   document.getElementById('tie-message').style.display = "none";
   document.getElementById('board-container').style.opacity = 1;
