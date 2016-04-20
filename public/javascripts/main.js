@@ -9,27 +9,28 @@ var board = [ {position: "topLeft"},
           {position: "center"}
 ];
 
+var loadSlotNeighbors = function(slotIndex,left, up, right, down){
+  var slot = board[slotIndex];
+  slot.neighbors = {};
+  slot.neighbors.left = board[left];
+  slot.neighbors.up = board[up];
+  slot.neighbors.right = board[right];
+  slot.neighbors.down = board[down];
+}
+
+loadSlotNeighbors(0, null, null, 1, 7)
+loadSlotNeighbors(1, 0, null, 2, 8)
+loadSlotNeighbors(2, 1, null, null, 3)
+loadSlotNeighbors(3, 8, 2, null, 4)
+loadSlotNeighbors(4, 5, 3, null, null)
+loadSlotNeighbors(5, 6, 8, 4, null)
+loadSlotNeighbors(6, null, 7, 5, null)
+loadSlotNeighbors(7, null, 0, 8, 6)
+loadSlotNeighbors(8, 7, 1, 3, 5)
+
 var x = " X ";
 var o = " O ";
 var blank = "[ ]";
-
-var rotateBaordView90Deg = function(){
-  var newFirst = board.slice(6,8);
-  var newLast = board.slice(0,6);
-  var center = board[8];
-  var newArr = newFirst;
-  newLast.forEach(function(each){
-    newArr.push(each);
-  })
-  newArr.push(center);
-  board = newArr;
-}
-
-var rotateBaordViewToOriginalPosition = function(){
-  while(board[0].position !== "topLeft"){
-    rotateBaordView90Deg();
-  }
-}
 
 var showBoard = function(){
   for(var i = 0; i < board.length; i++){
@@ -71,195 +72,185 @@ var updateGame = function(lastPlayer){
 }
 
 var computerMove = function() { 
-  var availWinsUser = [];
-  var availWinsComputer = [];
-  var slotsInRowNotBlocked = [];
+  
+  var forkMovesUser = [];
+  var forkMovesComputer = [];
 
-  var selectRandomIndex = function(array){
-    console.log("selectRandomIndex..")
-    var randomIndex = array[Math.floor(Math.random() * array.length)];
-    board[randomIndex].marker = x;
+  var winMovesComputer = [];
+  var winMovesUser = [];
+  var availCorners = [];
+  var availSides = [];
+
+  var selectRandom = function(slots){
+    var randomIndex = Math.floor(Math.random() * slots.length);
+    slots[randomIndex].marker = x;
+  }
+
+  var checkMoveOptions = function(playerMarker){
+
+    var mkr = playerMarker;
+    for(var i = 0; i < board.length; i++){
+      var objCount = {};
+      objCount.left = 0;
+      objCount.up = 0;
+      objCount.right = 0;
+      objCount.down = 0;
+
+      objCount.leftUp = 0;
+      objCount.rightUp = 0;
+      objCount.rightDown = 0;
+      objCount.leftDown = 0;
+
+      if(board[i].marker == blank){
+        //check for neighbors left recursively
+        var checkLeft = function(slot){
+          if(slot.neighbors.left){
+            if(slot.neighbors.left.marker == mkr){
+              objCount.left++;
+              checkLeft(slot.neighbors.left);
+            }
+          }
+        }
+        var checkUp = function(slot){
+          if(slot.neighbors.up){
+            if(slot.neighbors.up.marker == mkr){
+              objCount.up++;
+              checkUp(slot.neighbors.up)
+            }
+          }
+        }
+        var checkRight = function(slot){
+          if(slot.neighbors.right){
+            if(slot.neighbors.right.marker == mkr){
+              objCount.right++;
+              checkRight(slot.neighbors.right)
+            }
+          }
+        }
+        var checkdown = function(slot){
+          if(slot.neighbors.down){
+            if(slot.neighbors.down.marker == mkr){
+              objCount.down++;
+              checkdown(slot.neighbors.down)
+            }
+          }
+        }
+        var checkLeftUp = function(slot){
+          if(slot.neighbors.left && slot.neighbors.left.neighbors.up){
+            if(slot.neighbors.left.neighbors.up.marker == mkr){
+              objCount.leftUp++;
+              checkLeftUp(slot.neighbors.left.neighbors.up)
+            }
+          }
+        }
+        var checkRightUp = function(slot){
+          if(slot.neighbors.right && slot.neighbors.right.neighbors.up){
+            if(slot.neighbors.right.neighbors.up.marker == mkr){
+              objCount.rightUp++;
+              checkRightUp(slot.neighbors.right.neighbors.up)
+            }
+          }
+        }
+        var checkRightDown = function(slot){
+          if(slot.neighbors.right && slot.neighbors.right.neighbors.down){
+            if(slot.neighbors.right.neighbors.down.marker == mkr){
+              objCount.rightDown++;
+              checkRightDown(slot.neighbors.right.neighbors.down)
+            }
+          }
+        }
+        var checkLeftDown = function(slot){
+          if(slot.neighbors.left && slot.neighbors.left.neighbors.down){
+            if(slot.neighbors.left.neighbors.down.marker == mkr){
+              objCount.leftDown++;
+              checkLeftDown(slot.neighbors.left.neighbors.down)
+            }
+          }
+        }
+
+        checkLeft(board[i]);
+        checkUp(board[i]);
+        checkRight(board[i]);
+        checkdown(board[i]);
+
+        checkLeftUp(board[i]);
+        checkRightUp(board[i]);
+        checkRightDown(board[i]);
+        checkLeftDown(board[i]);
+        console.log(board[i], mkr, objCount);
+
+      }
+    }
+
+  }
+  var checkMoveOptionsComputer = function(){
+    checkMoveOptions(x)
+  }
+  var checkMoveOptionsUser = function(){
+    checkMoveOptions(o)
+  }
+
+  var checkForAvailCorners = function(){
+    var choices = [];
+    var boardCorners = [board[0],board[2],board[4],board[6]];
+    boardCorners.forEach(function(slot){
+      if(slot.marker == blank){
+        availCorners.push(slot);
+      }
+    })
+  }
+
+  var cornerMoveDoesNotForceUserFork = function(){
+    console.log('*** to be coded, temporarily not checking*******');
+    return true;
+  }
+
+  var checkForAvailSides = function(){
+    var choices = [];
+    var boardSides = [board[1],board[3],board[5],board[7]];
+    boardSides.forEach(function(slot){
+      if(slot.marker == blank){
+        availSides.push(slot);
+      }
+    })
   }
   
-  var checkForTwoSameAndOneBlankInRow = function(markerOfPlayer){
-    var mrkr = markerOfPlayer
-    var check = function(indexMarked1, indexMarked2, indexBlank){
-      var indexes = [indexMarked1, indexMarked2, indexBlank];
-      var rotateIndexes = function(){
-        indexes.unshift(indexes[2]);
-        var rotatedindexesArray = indexes.slice(0,3);
-        indexes = rotatedindexesArray;
-      }
-      for (var i = 0; i < indexes.length; i++){
-        if(board[indexes[0]].marker == mrkr && board[indexes[1]].marker == mrkr && board[indexes[2]].marker == blank){
-          mrkr == x ? availWinsComputer.push(board[indexes[2]]) : availWinsUser.push(board[indexes[2]]);
-        }
-        rotateIndexes();
-      }
-    }
-    if(availWinsComputer.length == 0){
-      check(0,2,1);
-      check(7,3,8);
-      check(0,4,8);
-    }
-  }
-
-  var checkForBlankSlotInRowNotBlocked = function(){
-    console.log("checkForBlankSlotInRowNotBlocked..")
-    var mrkr = x
-    var check = function(index1, index2, indexBlank){
-      var indexes = [index1, index2, indexBlank];
-      var rotateIndexes = function(){
-        indexes.unshift(indexes[2]);
-        var rotatedindexesArray = indexes.slice(0,3);
-        indexes = rotatedindexesArray;
-      }
-      for (var i = 0; i < indexes.length; i++){
-        if((board[indexes[0]].marker == mrkr || board[indexes[0]].marker == blank) && (board[indexes[1]].marker == mrkr || board[indexes[1]].marker == blank)&& board[indexes[2]].marker == blank){
-          slotsInRowNotBlocked.push(board[indexes[2]]);
-        }
-        rotateIndexes();
-      }
-    }
-    if(availWinsComputer.length == 0){
-      check(0,2,1);
-      check(7,3,8);
-      check(0,4,8);
-    }
-    console.log(slotsInRowNotBlocked);    
-  }
-    
-  var checkForWinMove = function(){
-    checkForTwoSameAndOneBlankInRow(x);
-  }
-  var checkForBlockMove = function(){
-    checkForTwoSameAndOneBlankInRow(o);
-  }
-
-  var chooseAnyAvailablePosition = function(){
-    var availBoardIndexes = [];
-    for (var i = 0; i < board.length; i++) {
-      availPositions.forEach(function(avail){
-        if(avail.position == board[i].position){
-          availBoardIndexes.push(i);
-        }
-      })
-    }
-    selectRandomIndex(availBoardIndexes);
-  }
 
   // Begin Computer check for scenarios
-  for (var i = 0; i < 4; i++){
-    var lastCheck = i == 3;
-    if(lastCheck){console.log("lastCheck!")}
-    checkForWinMove();
-    checkForBlockMove();
-    if(availWinsComputer.length > 0){
-      availWinsComputer[0].marker = x;
+  checkMoveOptionsComputer();
+  checkMoveOptionsUser()
+  checkForAvailCorners();
+  checkForAvailSides();
+    
+    if(winMovesComputer.length > 0){
+      winMovesComputer[0].marker = x;
       winner = "Computer wins!";
     }
-    else if(availWinsUser.length > 0 && lastCheck){
-      availWinsUser[0].marker = x;
+    else if(winMovesUser.length > 0){
+      winMovesUser[0].marker = x;
+    }
+    else if (forkMovesComputer.length > 0){
+      console.log('selecting forkMoves Computer')
+    }
+    else if(forkMovesUser.length > 0){
+      console.log('selecting forkMoves User')
+    }
+    else if(board[8].marker == blank){
+      console.log('choosing center')
+      board[8].marker = x;
+    }
+    else if(availCorners.length > 0 && cornerMoveDoesNotForceUserFork()){
+      console.log('choosing a corner');
+      selectRandom(availCorners);
+    }
+    else if(availSides.length > 0){
+      console.log('choosing a side');
+      selectRandom(availSides);
     }
     else{
-      if (moveCount == 0){
-        selectRandomIndex([0,2,4,6]);
-      }
-      else if (moveCount == 1){
-        if(board[0].marker == o){board[8].marker = x;
-          break;
-        }
-        if(board[1].marker == o){selectRandomIndex([0,2])
-          break;
-        }
-        if(board[8].marker == o){selectRandomIndex([0,2,4,6])
-          break;
-        }
-      }
-      else if (moveCount == 2){
-        if(board[0].marker == x){
-          if(board[8].marker == o){board[4].marker = x;
-            break;
-          }
-          if(board[1].marker == o){board[6].marker = x;
-            break;
-          }
-          if(board[7].marker == o){board[4].marker = x;
-            break;
-          }
-          if(board[2].marker == o || board[6].marker == o){board[4].marker = x;
-            break;
-          }
-          if(board[3].marker == o){board[6].marker = x;
-            break;
-          }
-          if(board[5].marker == o){board[2].marker = x;
-            break;
-          }
-          if(board[0].marker == x && board[4].marker == o){
-            selectRandomIndex([2,6]);
-            break;
-          }
-        }
-      }
-      else if (moveCount == 3){
-        if(board[0].marker == o && board[8].marker == x){
-          if(board[3].marker == o || board[5].marker == o){
-            selectRandomIndex([2,4,6]);
-            break;
-          }
-          if(board[4].marker == o){
-            selectRandomIndex([1,3,5,7])
-            break; 
-          }
-        }
-        if((board[0].marker == o && board[2].marker == x) || (board[2].marker == o && board[0].marker == x)){
-          if(board[1].marker == o){board[8].marker = x;
-            break;
-          }
-        }
-        if(board[8].marker == o && board[2].marker == x){
-          if(board[6].marker == o){
-            selectRandomIndex([0,4]);
-            break;
-          }
-        }
-      }
-      else if (moveCount == 4){
-        if(board[0].marker == x){
-          if(board[1].marker == o && board[7].marker == o){board[4].marker = x;
-            break;
-          }
-          if(board[3].marker == o && board[8].marker == o){board[6].marker = x;
-            break;
-          }
-          if(board[5].marker == o && board[8].marker == o){board[2].marker = x;
-            break;
-          }
-          if(board[1].marker == o && board[4].marker == o && board[2].marker == x){board[6].marker = x;
-            break;
-          }
-          if(board[1].marker == o && board[6].marker == o && board[2].marker == x){board[4].marker = x;
-            break;
-          }
-        }
-      }
-      else if(moveCount > 4 && lastCheck){
-        checkForBlankSlotInRowNotBlocked()
-        if (slotsInRowNotBlocked.length > 0){
-          selectRandomIndex(slotsInRowNotBlocked)
-        }
-        else{
-          selectRandomIndex(availPositions);
-        }
-      }
-      else{
-        console.log("No matchingscenarios iteration" + i)
-      }
+      console.log('no sides')
     }
-    rotateBaordView90Deg();
-  }
-  rotateBaordViewToOriginalPosition();
+    
   updateGame("Computer");
 
 }
