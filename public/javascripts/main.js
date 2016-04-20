@@ -178,6 +178,24 @@ var computerMove = function() {
         checkRightDown(board[i]);
         checkLeftDown(board[i]);
         console.log(board[i], mkr, objCount);
+        
+        // win move scenarios
+        var pushWinPosition = function(){
+          console.log("pushing win position ", board[i].position, mkr);
+          mkr == x ? winMovesComputer.push(board[i]) : winMovesUser.push(board[i]);
+        }
+        if(objCount.left + objCount.right == 2){
+          pushWinPosition();
+        }
+        if(objCount.leftUp + objCount.rightDown == 2){
+          pushWinPosition();
+        }
+        if(objCount.leftDown + objCount.rightUp == 2){
+          pushWinPosition();
+        }
+        if(objCount.up + objCount.down == 2){
+          pushWinPosition();
+        }
 
       }
     }
