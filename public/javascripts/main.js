@@ -50,10 +50,20 @@ var updateGame = function(lastPlayer){
   moveCount++;
   showBoard();
   availPositions = [];
+  var availCorners = [];
+  var availSides = [];
   var isBlank = function(slot){
     return slot.marker == blank;
   }
+  var isCorner = function(slot){
+    return slot == board[0] || slot == board[2] || slot == board[4] || slot == board[6];
+  }
+  var isSide = function(slot){
+    return slot == board[1] || slot == board[3] || slot == board[5] || slot == board[7];
+  }
   availPositions = board.filter(isBlank);
+  availCorners = availPositions.filter(isCorner);
+  availSides = availPositions.filter(isSide);
   
   if(winner){
     gameOverDisplay('win-message');
@@ -78,8 +88,6 @@ var computerMove = function() {
 
   var winMovesComputer = [];
   var winMovesUser = [];
-  var availCorners = [];
-  var availSides = [];
 
   var selectRandom = function(slots){
     var randomIndex = Math.floor(Math.random() * slots.length);
@@ -102,7 +110,19 @@ var computerMove = function() {
       objCount.leftDown = 0;
 
       if(board[i].marker == blank){
-        //check for neighbors left recursively
+        //check for neighbors
+        // var checkNeighbors = function(slot, direction){
+        //   var slot = slot;
+        //   var direction = direction;
+        //   if(slot.neighbors[direction]){
+        //     if(slot.neighbors[direction].marker == mkr){
+        //       objCount[direction]++;
+        //       checkNeighbors(slot.neighbors[direction]);
+        //     }
+        //   }
+
+        // }
+
         var checkLeft = function(slot){
           if(slot.neighbors.left){
             if(slot.neighbors.left.marker == mkr){
@@ -208,37 +228,14 @@ var computerMove = function() {
     checkMoveOptions(o)
   }
 
-  var checkForAvailCorners = function(){
-    var choices = [];
-    var boardCorners = [board[0],board[2],board[4],board[6]];
-    boardCorners.forEach(function(slot){
-      if(slot.marker == blank){
-        availCorners.push(slot);
-      }
-    })
-  }
-
   var cornerMoveDoesNotForceUserFork = function(){
     console.log('*** to be coded, temporarily not checking*******');
     return true;
   }
 
-  var checkForAvailSides = function(){
-    var choices = [];
-    var boardSides = [board[1],board[3],board[5],board[7]];
-    boardSides.forEach(function(slot){
-      if(slot.marker == blank){
-        availSides.push(slot);
-      }
-    })
-  }
-  
-
   // Begin Computer check for scenarios
   checkMoveOptionsComputer();
   checkMoveOptionsUser()
-  checkForAvailCorners();
-  checkForAvailSides();
     
     if(winMovesComputer.length > 0){
       winMovesComputer[0].marker = x;
